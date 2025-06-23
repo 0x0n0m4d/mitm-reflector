@@ -1,18 +1,30 @@
-import requests
-import sys
+import logging
 from mitmproxy import http
+from mitmproxy import addonmanager
 
 
-def automatedXSSTest() -> bool:
-    return True
+# @todo: create a http client
+# @todo: create the xss tester
+class Reflector:
+    def __init__(self) -> None:
+        self.endpoints = dict()
+
+    def load(self, loader: addonmanager.Loader) -> None:
+        loader.add_option(
+            name="xss_mode",
+            typespec=str,
+            default="passive",
+            help="Define the mode of the reflector: `-s mitm-reflector.py --set xss_mode='aggressive'`"
+        )
+        logging.info("mitm-reflector.py loaded")
+
+    def response(self, flow: http.HTTPFlow) -> None:
+        if flow.request.method == "GET":
+            if len(flow.request.query.items()) <= 0:
+                return
+        else:
+            if len(flow.request.content) <= 0:
+                return
 
 
-def request(flow: http.HTTPFlow) -> None:
-    # @todo: should match and start doing automated tests on the code
-    # @todo: this will get the request and will start making automated tests
-    # @todo: then, this will check the response and will start looking to
-    # @>>>>> the payload.
-    # @todo: if the payload was found, then this will save this on a file
-    if flow.request.method == "GET":
-        for k, v in flow.request.query.items():
-            print(v)
+addons = [Reflector()]
