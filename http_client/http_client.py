@@ -14,33 +14,46 @@ class HTTPResponse:
         self.body = body
 
 
+class Reflections:
+    def __init__(self, url, params, data) -> None:
+        self.url = url
+        self.params = params
+        self.data = data
+
+
 class HTTPClient:
     import requests
 
     def __init__(self, method, url, params, headers, data) -> None:
-        self.data = HTTPData(
+        self.req = HTTPData(
             method,
             url,
             params,
             headers,
             data
         )
+        self.resp = None
 
-    def get(self) -> HTTPResponse:
-        resp = self.requests.get(self.data.url, params=self.data.params,
-                                 headers=self.data.headers, timeout=30)
-        return HTTPResponse(
-            status=resp.status_code,
-            headers=resp.headers,
-            body=resp.content
+    def get(self) -> None:
+        resp = self.requests.get(self.req.url, params=self.req.params,
+                                 headers=self.req.headers, timeout=30)
+        self.resp = HTTPResponse(
+            resp.status_code,
+            resp.headers,
+            resp.content
         )
 
-    def post(self) -> HTTPResponse:
-        resp = self.requests.post(self.data.url, headers=self.data.headers,
-                                  params=self.data.params, data=self.data.data,
+    def post(self) -> None:
+        resp = self.requests.post(self.req.url, headers=self.req.headers,
+                                  params=self.req.params, data=self.req.data,
                                   timeout=30)
-        return HTTPResponse(
-            status=resp.status_code,
-            headers=resp.headers,
-            body=resp.content
+        self.resp = HTTPResponse(
+            resp.status_code,
+            resp.headers,
+            resp.content
         )
+
+    def searchReflections(self) -> Reflections:
+        # @todo: this will change the values of all the query and the data one by one
+        # @todo: then this needs to save the results on this Reflections class
+        return 0

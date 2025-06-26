@@ -8,7 +8,6 @@ from http_client import HTTPClient
 class Reflector:
     def __init__(self) -> None:
         self.endpoints = []
-        self.canRun = True
 
     def newEndpointItem(self, endpoint: str, status: int,
                         method: str, params: list, data: list,
@@ -35,6 +34,7 @@ class Reflector:
         if flow.request.method == "GET":
             if len(flow.request.query.items()) <= 0:
                 return
+
             client = HTTPClient(
                 flow.request.method,
                 flow.request.url,
@@ -42,9 +42,28 @@ class Reflector:
                 flow.request.headers,
                 dict()
             )
+            reflection = client.searchReflections()
+            if reflection is not None:
+                self.endpoints.append(client.searchReflections())
+
+            logging.warn(f"find {len(self.endpoints.params)} reflections")
         else:
-            if len(flow.request.content) <= 0:
+            if len(flow.request.content) <= 0 and \
+                    len(flow.request.query.items() <= 0):
                 return
+
+            client = HTTPClient(
+                flow.request.method,
+                flow.request.url,
+                flow.request.query.items(),
+                flow.request.headers,
+                flow.request.content
+            )
+            reflection = client.searchReflections()
+            if reflection is not None:
+                self.endpoints.append(client.searchReflections())
+
+            logging.warn(f"find {len(self.endpoints.params)} reflections")
     # @todo: i need a command to replay this logs
 
 
